@@ -1,0 +1,41 @@
+type Query {
+    getReservations(page: Page, date: String!): [Reservation]
+    getRestaurantTables(page: Page, minNumberOfSeats: Int!, date: String!, duration: Int!, status: String!): [RestaurantTable]
+}
+
+type Mutation {
+    newReservation(reservation: InputReservation!): String
+    reservationCancelRequest(id: ID!, status: String!): String
+    reservationCancel(id: ID!, verificationCode: String!): String
+}
+
+type Reservation {
+    id: ID
+    date: String
+    duration: Int
+    fullName: String
+    phone: String
+    email: String
+    numberOfSeats: Int
+    seatsNumber: Int
+}
+
+input InputReservation {
+    date: String!
+    duration: Int!
+    fullName: String!
+    phone: String!
+    email: String!
+    numberOfSeats: Int!
+}
+
+type RestaurantTable {
+    number: Int
+    minNumberOfSeats: Int
+    maxNumberOfSeats: Int
+}
+
+input Page {
+    pageNumber: Int!
+    maxRowsNumber: Int!
+}
