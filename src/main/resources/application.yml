@@ -1,0 +1,47 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:restaurantDB
+    driverClassName: org.h2.Driver
+    username: restaurant
+    password: tasty
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: true
+  mail:
+    host: smtp.ethereal.email
+    port: 587
+    username: fae.nienow91@ethereal.email
+    password: 3vqhtANMBUXxB5u8UR
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    from: tasty@restaurant.pl
+    html:
+      enabled: true
+    variable-replacer:
+      datetime-format: HH:mm dd.MM.yy
+
+application:
+  email:
+    subject:
+      new-reservation: New Reservation
+      cancel-req: Cancellation request
+      reservation-cancelled: Reservation cancelled
+  restaurant:
+    working-hours:
+      start: 11
+      end: 24
+    tables:
+      json:
+        filename: /seats.json
+
+logging:
+  level:
+    root: INFO
