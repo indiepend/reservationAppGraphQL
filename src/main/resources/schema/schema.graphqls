@@ -1,6 +1,6 @@
 type Query {
     getReservations(page: Page, date: String!): [Reservation]
-    getRestaurantTables(page: Page, minNumberOfSeats: Int!, date: String!, duration: Int!, status: String!): [RestaurantTable]
+    getRestaurantTables(page: Page, numberOfSeats: Int!, date: String!, duration: Int!, status: String!): [RestaurantTable]
 }
 
 type Mutation {
