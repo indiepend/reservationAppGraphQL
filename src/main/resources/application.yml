@@ -37,10 +37,11 @@ application:
   restaurant:
     working-hours:
       start: 11
-      end: 24
+      is-open-for-x-hours: 16
     tables:
       json:
         filename: /seats.json
+  hours-to-cancel: 2
 
 logging:
   level:

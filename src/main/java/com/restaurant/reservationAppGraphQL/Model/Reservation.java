@@ -35,15 +35,4 @@ public class Reservation {
     int getSeatsNumber(){
         return restaurantTable.getNumber();
     }
-
-    public static Boolean validate(final Reservation reservation){
-        return reservation.date.isAfter(LocalDateTime.now())
-                & reservation.duration <= 360
-                & reservation.duration >= 30
-                & reservation.fullName.matches("[A-Za-z]{3,30} [A-Za-z]{3,30}")
-                & reservation.phone.matches("[0-9]{9}")
-                & reservation.email.matches("^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$")
-                & reservation.email.length() < 255
-                & reservation.numberOfSeats > 0;
-    }
 }
