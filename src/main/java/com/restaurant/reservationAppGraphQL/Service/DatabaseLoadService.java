@@ -30,10 +30,8 @@ public class DatabaseLoadService {
     @PostConstruct
     public void loadJsonToObjects() {
         List<RestaurantTable> tables = new ArrayList<>();
-        InputStream inputStream = this.getClass().getResourceAsStream(file);
-        try {
+        try (InputStream inputStream = this.getClass().getResourceAsStream(file)){
             String jsonFile = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-            inputStream.close();
             tables = mapper.readValue(jsonFile, new TypeReference<>(){});
         }catch(IOException ex){
             log.warn("Can't load resource json file in method [DatabaseLoadService.loadJsonToObjects] " + ex.getMessage() + ex.getCause());
