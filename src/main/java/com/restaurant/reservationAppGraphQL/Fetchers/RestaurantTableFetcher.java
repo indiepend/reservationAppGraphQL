@@ -52,6 +52,7 @@ public class RestaurantTableFetcher {
                                         .stream().anyMatch(
                                         reservation -> predicateForReservation(reservation, date, duration))
                 );
+                break;
             case "all":
                 break;
             default:
@@ -63,6 +64,14 @@ public class RestaurantTableFetcher {
                     .limit(page.getMaxRowsNumber());
 
         return tableStream.collect(Collectors.toList());
+    }
+
+    public RestaurantTable findFirstFreeTable(int numberOfSeats, LocalDateTime date, int duration)
+    throws GraphQLClientException{
+            return getRestaurantTables(null, numberOfSeats, date.toString(), duration, "free")
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> { throw new GraphQLClientException(500, "/graphql", "no free table found", "req"); });
     }
 
     private boolean predicateForReservation(Reservation reservation, String localDate, int duration)
