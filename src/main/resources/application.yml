@@ -31,7 +31,7 @@ spring:
 application:
   email:
     subject:
-      new-reservation: New Reservation
+      new-reservation: New reservation
       cancel-req: Cancellation request
       reservation-cancelled: Reservation cancelled
   restaurant:
