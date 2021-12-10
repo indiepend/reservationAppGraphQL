@@ -43,6 +43,7 @@ public class EmailService {
                         message.setSubject(subject);
                         message.setText(content, htmlEnabled);
                         mailSender.send(mimeMessage);
+                        log.trace("Message send to:" + reservation.getEmail() + " subject: " + subject);
                     }catch(MessagingException ex){
                         log.error("Error in method [EmailService.sendEmail] " + ex.getMessage());
                     }
@@ -52,7 +53,7 @@ public class EmailService {
     private String reservationVariableReplacer(String content, Reservation reservation){
         return content
                 .replaceAll("\\{\\{FULLNAME}}", reservation.getFullName())
-                .replaceAll("\\{\\{ID}}", reservation.getID().toString())
+                .replaceAll("\\{\\{ID}}", reservation.getExternalId())
                 .replaceAll("\\{\\{PHONE}}", reservation.getPhone())
                 .replaceAll("\\{\\{TIME}}",
                         reservation.getDate().format(

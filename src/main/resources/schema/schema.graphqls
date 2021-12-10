@@ -4,13 +4,14 @@ type Query {
 }
 
 type Mutation {
-    newReservation(reservation: InputReservation!): String
+    newReservation(reservation: InputReservation!): Reservation
     reservationCancelRequest(id: ID!, status: String!): String
     reservationCancel(id: ID!, verificationCode: String!): String
 }
 
 type Reservation {
     id: ID
+    externalId: String
     date: String
     duration: Int
     fullName: String

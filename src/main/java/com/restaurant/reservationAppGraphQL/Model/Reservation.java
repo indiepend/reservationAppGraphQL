@@ -17,6 +17,7 @@ public class Reservation {
     @Id
     @GeneratedValue
     private Integer ID;
+    private String externalId;
     private LocalDateTime date;
     private int duration;
     private String fullName;
