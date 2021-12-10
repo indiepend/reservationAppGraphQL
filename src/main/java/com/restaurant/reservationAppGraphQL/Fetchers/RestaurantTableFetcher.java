@@ -9,8 +9,6 @@ import com.restaurant.reservationAppGraphQL.Model.Reservation;
 import com.restaurant.reservationAppGraphQL.Model.RestaurantTable;
 import com.restaurant.reservationAppGraphQL.Repository.RestaurantTableRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;

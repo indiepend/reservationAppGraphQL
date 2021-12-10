@@ -36,8 +36,22 @@ application:
       reservation-cancelled: Reservation cancelled
   restaurant:
     working-hours:
-      start: 11
-      is-open-for-x-hours: 16
+      start:
+        MONDAY: 12
+        TUESDAY: 12
+        WEDNESDAY: 13
+        THURSDAY: 14
+        FRIDAY: 14
+        SATURDAY: 10
+        SUNDAY: 10
+      is-open-for-x-hours:
+        MONDAY: 10
+        TUESDAY: 10
+        WEDNESDAY: 9
+        THURSDAY: 8
+        FRIDAY: 13
+        SATURDAY: 17
+        SUNDAY: 16
     tables:
       json:
         filename: /seats.json

@@ -29,6 +29,7 @@ public class ReservationFetcher {
     private final EmailService emailService;
     private final RestaurantTableFetcher restaurantTableFetcher;
     private final ReservationIDGenerator reservationIDGenerator;
+    private final ReservationValidatorService reservationValidatorService;
 
     @Value("${application.email.subject.new-reservation}")
     private String newReservationSubject;
@@ -66,7 +67,7 @@ public class ReservationFetcher {
 
     @DgsMutation
     public Reservation newReservation(@InputArgument Reservation reservation){
-        if(!ReservationValidatorService.validate(reservation))
+        if(!reservationValidatorService.validate(reservation))
             throw new GraphQLClientException(500, "/graphql", "validation error", "newReservation.reservation");
         RestaurantTable freeTable = restaurantTableFetcher.findFirstFreeTable(
                 reservation.getNumberOfSeats(),

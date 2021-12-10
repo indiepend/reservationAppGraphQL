@@ -10,7 +10,7 @@ type Mutation {
 }
 
 type Reservation {
-    id: ID
+    ID: ID
     externalId: String
     date: String
     duration: Int
