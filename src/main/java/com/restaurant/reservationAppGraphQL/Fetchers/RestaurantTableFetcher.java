@@ -9,12 +9,13 @@ import com.restaurant.reservationAppGraphQL.Model.Reservation;
 import com.restaurant.reservationAppGraphQL.Model.RestaurantTable;
 import com.restaurant.reservationAppGraphQL.Repository.RestaurantTableRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @DgsComponent
 @RequiredArgsConstructor
@@ -28,42 +29,22 @@ public class RestaurantTableFetcher {
                                                      @InputArgument String date,
                                                      @InputArgument int duration,
                                                      @InputArgument String status){
-        Stream<RestaurantTable> tableStream;
-        tableStream = restaurantTableRepository
+        List<RestaurantTable> restaurantTableList;
+        restaurantTableList = restaurantTableRepository
                 .findAll()
                 .stream()
-                .filter( restaurantTable -> restaurantTable.getMinNumberOfSeats() >= numberOfSeats)
-                .filter( restaurantTable -> restaurantTable.getMaxNumberOfSeats() <= numberOfSeats);
-        switch (status){
-            case "free":
-                tableStream = tableStream.filter(
-                        restaurantTable ->
-                            restaurantTable
-                                    .getReservations()
-                                    .stream().noneMatch(
-                                            reservation -> predicateForReservation(reservation, date, duration))
-                        );
-                break;
-            case "taken":
-                tableStream = tableStream.filter(
-                        restaurantTable ->
-                                restaurantTable
-                                        .getReservations()
-                                        .stream().anyMatch(
-                                        reservation -> predicateForReservation(reservation, date, duration))
-                );
-                break;
-            case "all":
-                break;
-            default:
-                throw new GraphQLClientException(500, "/graphql", "there is no such status available", "req");
-        }
-        if(page != null)
-            tableStream = tableStream
-                    .skip(page.getPageNumber() * page.getMaxRowsNumber())
-                    .limit(page.getMaxRowsNumber());
+                .filter( restaurantTable -> restaurantTable.getMinNumberOfSeats() <= numberOfSeats)
+                .filter( restaurantTable -> restaurantTable.getMaxNumberOfSeats() >= numberOfSeats)
+                .filter( restaurantTable -> filterByStatus(restaurantTable, status, date, duration))
+                .collect(Collectors.toList());
 
-        return tableStream.collect(Collectors.toList());
+        if(page != null)
+            restaurantTableList = restaurantTableList
+                    .stream()
+                    .skip(page.getPageNumber() * page.getMaxRowsNumber())
+                    .limit(page.getMaxRowsNumber())
+                    .collect(Collectors.toList());
+        return restaurantTableList;
     }
 
     public RestaurantTable findFirstFreeTable(int numberOfSeats, LocalDateTime date, int duration)
@@ -72,6 +53,26 @@ public class RestaurantTableFetcher {
                     .stream()
                     .findFirst()
                     .orElseThrow(() -> { throw new GraphQLClientException(500, "/graphql", "no free table found", "req"); });
+    }
+
+    private boolean filterByStatus(RestaurantTable restaurantTable, String status, String date, int duration)
+            throws GraphQLClientException{
+        switch (status){
+            case "free":
+                return restaurantTable
+                        .getReservations()
+                        .stream().noneMatch(
+                                reservation -> predicateForReservation(reservation, date, duration));
+            case "taken":
+                return restaurantTable
+                        .getReservations()
+                        .stream().anyMatch(
+                                reservation -> predicateForReservation(reservation, date, duration));
+            case "all":
+                return true;
+            default:
+                throw new GraphQLClientException(500, "/graphql", "there is no such status available", "req");
+        }
     }
 
     private boolean predicateForReservation(Reservation reservation, String localDate, int duration)

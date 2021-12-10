@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class Page {
-    private final int pageNumber;
-    private final int maxRowsNumber;
+    private int pageNumber;
+    private int maxRowsNumber;
 }
