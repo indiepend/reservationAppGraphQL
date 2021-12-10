@@ -13,6 +13,7 @@ import com.restaurant.reservationAppGraphQL.Service.EmailService;
 import com.restaurant.reservationAppGraphQL.Service.ReservationIDGenerator;
 import com.restaurant.reservationAppGraphQL.Service.ReservationValidatorService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 @DgsComponent
 @RequiredArgsConstructor
+@Slf4j
 public class ReservationFetcher {
 
     private final ReservationRepository reservationRepository;
@@ -54,7 +56,7 @@ public class ReservationFetcher {
                                             .equals(LocalDate.parse(date)))
                     .collect(Collectors.toList());
         } catch(DateTimeParseException ex){
-            throw new GraphQLClientException(500, "/graphql", "error while parsing date " + ex.getMessage(), "getReservations.date");
+            throw new GraphQLClientException(400, "/graphql", "error while parsing date " + ex.getMessage(), "getReservations.date");
         }
         if(page != null)
             reservationList = reservationList
@@ -68,7 +70,7 @@ public class ReservationFetcher {
     @DgsMutation
     public Reservation newReservation(@InputArgument Reservation reservation){
         if(!reservationValidatorService.validate(reservation))
-            throw new GraphQLClientException(500, "/graphql", "validation error", "newReservation.reservation");
+            throw new GraphQLClientException(400, "/graphql", "validation error", "newReservation.reservation");
         RestaurantTable freeTable = restaurantTableFetcher.findFirstFreeTable(
                 reservation.getNumberOfSeats(),
                 reservation.getDate(),
@@ -79,7 +81,8 @@ public class ReservationFetcher {
         freeTable.addReservation(reservation);
         Reservation newReservation = reservationRepository.saveAndFlush(reservation);
         emailService.sendReservationEmail(newReservationSubject, newReservation);
-        return newReservation;
+        log.trace("New reservation with ID: " + reservation.getID() + " has been added");
+        return reservation;
     }
 
     @DgsMutation(field = "reservationCancelRequest")
@@ -92,9 +95,9 @@ public class ReservationFetcher {
                                 reservation.setVerificationCode(verificationCode);
                                 reservationRepository.saveAndFlush(reservation);
                                 emailService.sendReservationEmail(cancelReqSubject, reservation);
-                            } else throw new GraphQLClientException(500, "/graphql", "required status is invalid", "reservationCancelRequest.status");
-                    } else throw new GraphQLClientException(500, "/graphql", "time to cancel reservation is up ", "reservationCancelRequest");
-                }, () -> { throw new GraphQLClientException(500, "/graphql", "no such reservation id found", "reservationCancelRequest.id"); });
+                            } else throw new GraphQLClientException(400, "/graphql", "required status is invalid", "reservationCancelRequest.status");
+                    } else throw new GraphQLClientException(400, "/graphql", "time to cancel reservation is up ", "reservationCancelRequest");
+                }, () -> { throw new GraphQLClientException(404, "/graphql", "no such reservation id found", "reservationCancelRequest.id"); });
         return "OK";
     }
 
@@ -106,9 +109,9 @@ public class ReservationFetcher {
                         if (reservation.getVerificationCode().equals(verificationCode)) {
                             emailService.sendReservationEmail(resCancelledSubject, reservation);
                             reservationRepository.delete(reservation);
-                        } else throw new GraphQLClientException(500, "/graphql", "verification code is invalid ", "reservationCancel");
-                    } else throw new GraphQLClientException(500, "/graphql", "time to cancel reservation is up ", "reservationCancel");
-                    },() -> { throw new GraphQLClientException(500, "/graphql", "no such reservation id found", "reservationCancel"); });
+                        } else throw new GraphQLClientException(400, "/graphql", "verification code is invalid ", "reservationCancel");
+                    } else throw new GraphQLClientException(400, "/graphql", "time to cancel reservation is up ", "reservationCancel");
+                    },() -> { throw new GraphQLClientException(404, "/graphql", "no such reservation id found", "reservationCancel"); });
         return "OK";
     }
 }

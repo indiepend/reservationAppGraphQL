@@ -50,7 +50,7 @@ public class RestaurantTableFetcher {
             return getRestaurantTables(null, numberOfSeats, date.toString(), duration, "free")
                     .stream()
                     .findFirst()
-                    .orElseThrow(() -> { throw new GraphQLClientException(500, "/graphql", "no free table found", "req"); });
+                    .orElseThrow(() -> { throw new GraphQLClientException(404, "/graphql", "no free table found", "req"); });
     }
 
     private boolean filterByStatus(RestaurantTable restaurantTable, String status, String date, int duration)
@@ -69,7 +69,7 @@ public class RestaurantTableFetcher {
             case "all":
                 return true;
             default:
-                throw new GraphQLClientException(500, "/graphql", "there is no such status available", "req");
+                throw new GraphQLClientException(400, "/graphql", "there is no such status available", "req");
         }
     }
 
@@ -86,7 +86,7 @@ public class RestaurantTableFetcher {
                             .parse(localDate)
                             .plusMinutes(duration));
         } catch (DateTimeParseException ex){
-            throw new GraphQLClientException(500, "/graphql", "error while parsing date " + ex.getMessage(), "req");
+            throw new GraphQLClientException(400, "/graphql", "error while parsing date " + ex.getMessage(), "req");
         }
     }
 }
