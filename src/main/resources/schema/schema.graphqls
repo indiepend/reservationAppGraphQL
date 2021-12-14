@@ -1,6 +1,6 @@
 type Query {
     getReservations(page: Page, date: String!): [Reservation]
-    getRestaurantTables(page: Page, numberOfSeats: Int!, date: String!, duration: Int!, status: String!): [RestaurantTable]
+    getRestaurantTables(page: Page, numberOfSeats: Int!, date: String!, duration: Int!, status: Status!): [RestaurantTable]
 }
 
 type Mutation {
@@ -39,4 +39,10 @@ type RestaurantTable {
 input Page {
     pageNumber: Int!
     maxRowsNumber: Int!
+}
+
+enum Status {
+  FREE
+  TAKEN
+  ALL
 }

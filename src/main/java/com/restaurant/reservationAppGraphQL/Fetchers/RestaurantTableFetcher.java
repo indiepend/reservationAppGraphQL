@@ -21,12 +21,18 @@ public class RestaurantTableFetcher {
 
     private final RestaurantTableRepository restaurantTableRepository;
 
+    public enum Status {
+        FREE,
+        TAKEN,
+        ALL
+    }
+
     @DgsQuery
     public List<RestaurantTable> getRestaurantTables(@InputArgument Page page,
                                                      @InputArgument int numberOfSeats,
                                                      @InputArgument String date,
                                                      @InputArgument int duration,
-                                                     @InputArgument String status){
+                                                     @InputArgument Status status){
         List<RestaurantTable> restaurantTableList;
         restaurantTableList = restaurantTableRepository
                 .findAll()
@@ -47,26 +53,26 @@ public class RestaurantTableFetcher {
 
     public RestaurantTable findFirstFreeTable(int numberOfSeats, LocalDateTime date, int duration)
     throws GraphQLClientException{
-            return getRestaurantTables(null, numberOfSeats, date.toString(), duration, "free")
+            return getRestaurantTables(null, numberOfSeats, date.toString(), duration, Status.FREE)
                     .stream()
                     .findFirst()
                     .orElseThrow(() -> { throw new GraphQLClientException(404, "/graphql", "no free table found", "req"); });
     }
 
-    private boolean filterByStatus(RestaurantTable restaurantTable, String status, String date, int duration)
+    private boolean filterByStatus(RestaurantTable restaurantTable, Status status, String date, int duration)
             throws GraphQLClientException{
         switch (status){
-            case "free":
+            case FREE:
                 return restaurantTable
                         .getReservations()
                         .stream().noneMatch(
                                 reservation -> predicateForReservation(reservation, date, duration));
-            case "taken":
+            case TAKEN:
                 return restaurantTable
                         .getReservations()
                         .stream().anyMatch(
                                 reservation -> predicateForReservation(reservation, date, duration));
-            case "all":
+            case ALL:
                 return true;
             default:
                 throw new GraphQLClientException(400, "/graphql", "there is no such status available", "req");
